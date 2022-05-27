@@ -1,0 +1,28 @@
+# ---
+# # VPC
+# tf-aws-vpc-with-dhcp-options:
+#   source : "git@bitbucket.org:edrans/tf-aws-vpc-with-dhcp-options"
+#   version: "7.1.0"
+
+# # Label
+# tf-null-label:
+#   source : "git@bitbucket.org:edrans/tf-null-label"
+#   version: "3.3.0"
+
+# tf-aws-tfstate-s3-dynamodb:
+#   source: "git@bitbucket.org:edrans/tf-aws-tfstate-s3-dynamodb"
+#   version: "2.0.0"
+
+# # EC2
+# tf-aws-amazon-linux-ami:
+#   source : "git@bitbucket.org:edrans/tf-aws-amazon-linux-ami"
+#   version: "1.2.0"
+
+# tf-aws-ubuntu-ami:
+#   source : "git@bitbucket.org:edrans/tf-aws-ubuntu-ami"
+#   version: "2.1.0"
+
+# # ECS
+# tf-aws-ecs-cluster:
+#   source : "git@bitbucket.org:edrans/tf-aws-ecs-cluster"
+#   version: "2.1.1"
