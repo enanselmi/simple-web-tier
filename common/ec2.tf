@@ -20,6 +20,16 @@ resource "aws_autoscaling_group" "cnb_webserver" {
   target_group_arns = [aws_lb_target_group.cnb_webserver_target.arn]
   health_check_type = "EC2"
 
+  warm_pool {
+    pool_state                  = "Stopped"
+    min_size                    = 2
+    max_group_prepared_capacity = 10
+
+    # instance_reuse_policy {
+    #   reuse_on_scale_in = true
+    # }
+  }
+
   tag {
     key                 = "Name"
     value               = "CNB_webserver"
@@ -27,6 +37,20 @@ resource "aws_autoscaling_group" "cnb_webserver" {
   }
 
 }
+
+resource "aws_autoscaling_policy" "cnb_webserver_policy" {
+  name                   = "cnb_webserver_policy"
+  autoscaling_group_name = aws_autoscaling_group.cnb_webserver.name
+  policy_type            = "TargetTrackingScaling"
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    target_value = "40.0"
+  }
+}
+
+
 
 resource "aws_security_group" "cnb_webserver_sg" {
   name        = "cnb_webserver_sg"
