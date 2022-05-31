@@ -1,6 +1,6 @@
 resource "aws_launch_configuration" "cnb_webserver" {
-  image_id             = "ami-0022f774911c1d690"
-  instance_type        = "t2.micro"
+  image_id             = var.launch_configuration.image_id
+  instance_type        = var.launch_configuration.instance_type
   security_groups      = [aws_security_group.cnb_webserver_sg.id]
   user_data            = file("../../common/user-data-apache.sh")
   iam_instance_profile = aws_iam_instance_profile.cnb_ec2_ssm.arn
@@ -14,47 +14,43 @@ resource "aws_autoscaling_group" "cnb_webserver" {
   launch_configuration = aws_launch_configuration.cnb_webserver.id
   vpc_zone_identifier  = [for subnet in aws_subnet.cnb_private_subnets : subnet.id]
 
-  min_size = 2
-  max_size = 4
+  min_size = var.asg.min_size
+  max_size = var.asg.max_size
 
   target_group_arns = [aws_lb_target_group.cnb_webserver_target.arn]
-  health_check_type = "EC2"
+  health_check_type = var.asg.health_check_type
 
   warm_pool {
-    pool_state                  = "Stopped"
-    min_size                    = 2
-    max_group_prepared_capacity = 10
+    pool_state                  = var.asg.warm_pool_state
+    min_size                    = var.asg.warm_min_size
+    max_group_prepared_capacity = var.asg.warm_max_group_prepared_capacity
 
     # instance_reuse_policy {
     #   reuse_on_scale_in = true
     # }
   }
 
-  tag {
-    key                 = "Name"
-    value               = "CNB_webserver"
-    propagate_at_launch = true
-  }
+  tags = var.asg_tags.default
 
 }
 
 resource "aws_autoscaling_policy" "cnb_webserver_policy" {
-  name                   = "cnb_webserver_policy"
+  name                   = var.asg_policy.name
   autoscaling_group_name = aws_autoscaling_group.cnb_webserver.name
-  policy_type            = "TargetTrackingScaling"
+  policy_type            = var.asg_policy.policy_type
   target_tracking_configuration {
     predefined_metric_specification {
-      predefined_metric_type = "ASGAverageCPUUtilization"
+      predefined_metric_type = var.asg_policy.predefined_metric_type
     }
-    target_value = "40.0"
+    target_value = var.asg_policy.target_value
   }
 }
 
 
 
 resource "aws_security_group" "cnb_webserver_sg" {
-  name        = "cnb_webserver_sg"
-  description = "Allow HTTPS inbound traffic from ALB"
+  name        = var.asg_sg.name
+  description = var.asg_sg.description
   vpc_id      = aws_vpc.cnb_vpc.id
 
   ingress {
@@ -76,12 +72,12 @@ resource "aws_security_group" "cnb_webserver_sg" {
 }
 
 resource "aws_iam_instance_profile" "cnb_ec2_ssm" {
-  name = "CNB-EC2-SSM"
+  name = var.iam.instance_profile_name
   role = aws_iam_role.cnb_ec2_ssm.name
 }
 
 resource "aws_iam_role" "cnb_ec2_ssm" {
-  name = "CNB-EC2-SSM"
+  name = var.iam.iam_role_name
   # path = "/"
 
   assume_role_policy = <<EOF
@@ -102,7 +98,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "cnb_ec2_ssm" {
-  name = "cnb_ec2_ssm"
+  name = var.iam.iam_role_policy_name
   role = aws_iam_role.cnb_ec2_ssm.id
 
   policy = <<EOF

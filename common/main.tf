@@ -1,9 +1,9 @@
 resource "aws_vpc" "cnb_vpc" {
-  cidr_block           = var.vpc_cidr.default
-  enable_dns_support   = "true"
-  enable_dns_hostnames = "true"
-  enable_classiclink   = "false"
-  instance_tenancy     = "default"
+  cidr_block           = var.vpc.cidr
+  enable_dns_support   = var.vpc.enable_dns_support
+  enable_dns_hostnames = var.vpc.enable_dns_hostnames
+  enable_classiclink   = var.vpc.enable_classiclink
+  instance_tenancy     = var.vpc.instance_tenancy
   tags = {
     Name = "CNB VPC test"
   }
