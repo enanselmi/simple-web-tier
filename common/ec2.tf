@@ -1,3 +1,43 @@
+resource "aws_instance" "cnb_windows" {
+  #ami                   = "ami-0e2c8caa770b20b08"
+  ami                    = "ami-0da644b56519f3a2f"
+  instance_type          = "c5.xlarge"
+  key_name               = "windows-test"
+  subnet_id              = aws_subnet.cnb_private_subnets[0].id
+  vpc_security_group_ids = [aws_security_group.windows_instance.id]
+  iam_instance_profile   = aws_iam_instance_profile.cnb_ec2_ssm.name
+  # network_interface {
+  #   network_interface_id = aws_network_interface.windows_eni.id
+  #   device_index         = 0
+  # }
+}
+
+
+# resource "aws_network_interface" "windows_eni" {
+#   subnet_id = aws_subnet.cnb_private_subnets[0].id
+# }
+
+resource "aws_security_group" "windows_instance" {
+  name   = "windows-security-group"
+  vpc_id = aws_vpc.cnb_vpc.id
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
+
 resource "aws_launch_configuration" "cnb_webserver" {
   image_id             = var.launch_configuration.image_id
   instance_type        = var.launch_configuration.instance_type
