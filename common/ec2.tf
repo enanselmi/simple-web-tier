@@ -10,6 +10,10 @@ resource "aws_instance" "cnb_windows" {
   #   network_interface_id = aws_network_interface.windows_eni.id
   #   device_index         = 0
   # }
+  tags = {
+    platform = "windows"
+    Name     = "Windows-2022"
+  }
 }
 
 

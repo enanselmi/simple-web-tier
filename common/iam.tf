@@ -28,20 +28,41 @@ resource "aws_iam_user_policy" "simple_user_policy" {
         {
             "Effect": "Allow",
             "Action": [
-                "ssm:SendCommand",
-                "ssm:ResumeSession",
                 "ssm:GetDocument",
                 "ssm:UpdateDocument",
-                "ssm:TerminateSession",
-                "ssm:CreateDocument",
-                "ssm:StartSession"
+                "ssm:CreateDocument"                
             ],
-            "Resource": [
-                "arn:aws:ec2:*:*:instance/*",
-                "arn:aws:ssm:*:*:session/simple_user-*",
+            "Resource": [                
                 "arn:aws:ssm:*:*:document/SSM-SessionManagerRunShell",
                 "arn:aws:ssm:*:*:document/AWS-StartPortForwardingSession"
             ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:ResumeSession",
+                "ssm:TerminateSession"
+            ],
+            "Resource": [                
+                "arn:aws:ssm:*:*:session/simple_user-*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:SendCommand",
+                "ssm:StartSession"
+            ],
+            "Resource": [
+                "arn:aws:ec2:*:*:instance/*"         
+            ],
+            "Condition": {
+                "StringLike": {
+                    "ssm:resourceTag/platform": [
+                        "windows"
+                    ]
+                }
+            }
         }
     ]
 }
