@@ -9,6 +9,7 @@
 
 output "simple_user_access_secret" {
   value = aws_iam_access_key.simple_user_access_key.secret
+   sensitive = true
 }
 output "simple_user_access_enc_secret" {
   value = aws_iam_access_key.simple_user_access_key.encrypted_secret

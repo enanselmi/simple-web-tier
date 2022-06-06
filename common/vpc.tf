@@ -93,6 +93,36 @@ resource "aws_route_table_association" "cnb_crta_private_subnets" {
   route_table_id = aws_route_table.cnb_private_crts[count.index].id
 }
 
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = aws_vpc.cnb_vpc.id
+  service_name      = "com.amazonaws.us-east-1.s3"
+  vpc_endpoint_type = "Gateway"
 
+  tags = {
+    Name = "S3-endpoint"
+  }
+}
+
+resource "aws_vpc_endpoint_route_table_association" "s3_public_rt" {
+  count           = length(var.private_subnets.default)
+  route_table_id  = aws_route_table.cnb_private_crts[count.index].id
+  vpc_endpoint_id = aws_vpc_endpoint.s3.id
+}
+
+resource "aws_vpc_endpoint" "dynamodb" {
+  vpc_id            = aws_vpc.cnb_vpc.id
+  service_name      = "com.amazonaws.us-east-1.dynamodb"
+  vpc_endpoint_type = "Gateway"
+
+  tags = {
+    Name = "DynamoDB-endpoint"
+  }
+}
+
+resource "aws_vpc_endpoint_route_table_association" "dynamodb_public_rt" {
+  count           = length(var.private_subnets.default)
+  route_table_id  = aws_route_table.cnb_private_crts[count.index].id
+  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
+}
 
 
