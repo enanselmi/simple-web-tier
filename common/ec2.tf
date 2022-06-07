@@ -1,6 +1,6 @@
 resource "aws_instance" "cnb_windows" {
-  #ami                    = "ami-0da644b56519f3a2f"
-  ami                    = "ami-0e2c8caa770b20b08"
+  #ami                    = "ami-0e2c8caa770b20b08"
+  ami                    = "ami-0e4eb3558ed6398c8"
   instance_type          = "c5.xlarge"
   key_name               = "windows-test"
   subnet_id              = aws_subnet.cnb_private_subnets[0].id
@@ -177,7 +177,12 @@ resource "aws_iam_role_policy" "cnb_ec2_ssm" {
                 "ssm:PutConfigurePackageResult",
                 "ssm:UpdateAssociationStatus",
                 "ssm:UpdateInstanceAssociationStatus",
-                "ssm:UpdateInstanceInformation"
+                "ssm:UpdateInstanceInformation",
+                "secretsmanager:GetResourcePolicy",
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:ListSecretVersionIds",
+                "secretsmanager:ListSecrets"
             ],
             "Resource": "*"
         },
@@ -207,3 +212,5 @@ resource "aws_iam_role_policy" "cnb_ec2_ssm" {
 }
 EOF
 }
+
+
