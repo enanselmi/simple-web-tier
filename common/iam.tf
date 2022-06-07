@@ -63,8 +63,24 @@ resource "aws_iam_user_policy" "simple_user_policy" {
                     ]
                 }
             }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:GetResourcePolicy",
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:ListSecretVersionIds",
+                "secretsmanager:ListSecrets"
+            ],
+            "Resource": [
+                "*"
+            ]
         }
     ]
 }
 EOF
 }
+
+
+

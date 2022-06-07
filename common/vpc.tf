@@ -79,8 +79,8 @@ resource "aws_route_table" "cnb_private_crts" {
   count  = length(var.private_subnets.default)
   vpc_id = aws_vpc.cnb_vpc.id
   route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.nat_gateways[count.index].id
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_gateways[count.index].id
   }
   tags = {
     Name = "CNB-Private-CRT-${var.azs.default[count.index]}"

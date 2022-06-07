@@ -1,11 +1,11 @@
 env = {
-  name           = "qa"
-  prefix         = "qa"
-  region         = "us-east-1"
-  key_name       = "qa"
-  project        = "template"
-  costCenter     = "CloudEng"
-  owner          = "default"
+  name       = "qa"
+  prefix     = "qa"
+  region     = "us-east-1"
+  key_name   = "qa"
+  project    = "template"
+  costCenter = "CloudEng"
+  owner      = "default"
 }
 
 vpc = {

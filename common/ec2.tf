@@ -1,6 +1,6 @@
 resource "aws_instance" "cnb_windows" {
-  #ami                   = "ami-0e2c8caa770b20b08"
-  ami                    = "ami-0da644b56519f3a2f"
+  #ami                    = "ami-0da644b56519f3a2f"
+  ami                    = "ami-0e2c8caa770b20b08"
   instance_type          = "c5.xlarge"
   key_name               = "windows-test"
   subnet_id              = aws_subnet.cnb_private_subnets[0].id
@@ -10,6 +10,17 @@ resource "aws_instance" "cnb_windows" {
   #   network_interface_id = aws_network_interface.windows_eni.id
   #   device_index         = 0
   # }
+  user_data = file("../../common/user_data_dc.ps1")
+
+  #   user_data = <<EOF
+  # <powershell>
+  # $password2 = $("Pa##w0rd2" | ConvertTo-SecureString -AsPlainText -Force)
+  # new-localuser -name "localadmin2" -password $password2
+  # add-localgroupmember -group "Remote Desktop Users" -member "localadmin2"
+  # add-localgroupmember -group "Administrators" -member "localadmin2"
+  # </powershell>
+  #   EOF
+
   tags = {
     platform = "windows"
     Name     = "Windows-2022"
