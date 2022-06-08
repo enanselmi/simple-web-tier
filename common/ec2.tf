@@ -1,36 +1,17 @@
 resource "aws_instance" "cnb_windows" {
-  #ami                    = "ami-0e2c8caa770b20b08"
-  ami                    = "ami-0e4eb3558ed6398c8"
+  #ami = "ami-0e4eb3558ed6398c8" #Ami used in CNB prd account (USA)
+  ami                    = "ami-0efd91e0e06eafc06" #Custom AMI With AWS CLI included
   instance_type          = "c5.xlarge"
   key_name               = "windows-test"
   subnet_id              = aws_subnet.cnb_private_subnets[0].id
   vpc_security_group_ids = [aws_security_group.windows_instance.id]
   iam_instance_profile   = aws_iam_instance_profile.cnb_ec2_ssm.name
-  # network_interface {
-  #   network_interface_id = aws_network_interface.windows_eni.id
-  #   device_index         = 0
-  # }
-  user_data = file("../../common/user_data_dc.ps1")
-
-  #   user_data = <<EOF
-  # <powershell>
-  # $password2 = $("Pa##w0rd2" | ConvertTo-SecureString -AsPlainText -Force)
-  # new-localuser -name "localadmin2" -password $password2
-  # add-localgroupmember -group "Remote Desktop Users" -member "localadmin2"
-  # add-localgroupmember -group "Administrators" -member "localadmin2"
-  # </powershell>
-  #   EOF
-
+  user_data              = file("../../common/user_data_dc.ps1")
   tags = {
     platform = "windows"
     Name     = "Windows-2022"
   }
 }
-
-
-# resource "aws_network_interface" "windows_eni" {
-#   subnet_id = aws_subnet.cnb_private_subnets[0].id
-# }
 
 resource "aws_security_group" "windows_instance" {
   name   = "windows-security-group"
@@ -50,8 +31,6 @@ resource "aws_security_group" "windows_instance" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-
 
 resource "aws_launch_configuration" "cnb_webserver" {
   image_id             = var.launch_configuration.image_id
