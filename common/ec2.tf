@@ -7,6 +7,7 @@ resource "aws_instance" "cnb_windows" {
   vpc_security_group_ids = [aws_security_group.windows_instance.id]
   iam_instance_profile   = aws_iam_instance_profile.cnb_ec2_ssm.name
   user_data              = file("../../common/user_data_dc.ps1")
+  private_ip             = "10.200.2.10"
   tags = {
     platform = "windows"
     Name     = "Windows-2022"

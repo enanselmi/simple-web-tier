@@ -9,6 +9,15 @@ resource "aws_vpc" "cnb_vpc" {
   }
 }
 
+resource "aws_vpc_dhcp_options" "dns_resolver" {
+  domain_name_servers = ["8.8.8.8", "8.8.4.4"]
+}
+
+resource "aws_vpc_dhcp_options_association" "dns_resolver" {
+  vpc_id          = aws_vpc.cnb_vpc.id
+  dhcp_options_id = aws_vpc_dhcp_options.dns_resolver.id
+}
+
 resource "aws_subnet" "cnb_public_subnets" {
   vpc_id                  = aws_vpc.cnb_vpc.id
   count                   = length(var.public_subnets.default)
