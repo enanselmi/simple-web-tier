@@ -17,7 +17,4 @@ output "simple_user_access_enc_secret" {
 output "simple_user_access_id" {
   value = aws_iam_access_key.simple_user_access_key.id
 }
-output "cnb_windows" {
-  value = aws_instance.cnb_windows_ad.id
 
-}

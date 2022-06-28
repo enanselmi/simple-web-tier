@@ -70,4 +70,23 @@ resource "aws_cloudwatch_metric_alarm" "EC2_CPU_Usage_Alarm" {
   threshold           = "70"
   alarm_description   = "This metric monitors ec2 cpu utilization exceeding 70%"
   ok_actions          = [aws_sns_topic.monitoring.arn]
+  alarm_actions       = [aws_sns_topic.monitoring.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "EC2_MEM_Usage_Alarm" {
+  alarm_name          = "EC2_MEM_Usage_Alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "Memory % Committed Bytes In Use"
+  namespace           = "MyWindowsServer"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "70"
+  alarm_description   = "This metric monitors ec2 memory utilization exceeding 70%"
+  ok_actions          = [aws_sns_topic.monitoring.arn]
+  alarm_actions       = [aws_sns_topic.monitoring.arn]
+
+  # dimensions = {
+  #   InstanceId = "ami-041306c411c38a789"
+  # }
 }
