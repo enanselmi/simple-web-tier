@@ -50,8 +50,10 @@ resource "aws_security_group" "windows_instance" {
   }
 }
 
+
+
 resource "aws_launch_configuration" "cnb_webserver" {
-  image_id             = var.launch_configuration.image_id
+  image_id             = data.aws_ami.amazon-linux-2.id
   instance_type        = var.launch_configuration.instance_type
   security_groups      = [aws_security_group.cnb_webserver_sg.id]
   user_data            = file("../../common/user-data-apache.sh")
