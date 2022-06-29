@@ -59,6 +59,12 @@ data "aws_iam_policy_document" "monitoring_sns_topic_policy" {
   }
 }
 
+resource "aws_ssm_parameter" "windows_agent_config" {
+  name  = "WindowsAgentConfig"
+  type  = "String"
+  value = file("../../common/data/WindowsAgentConfig.json")
+}
+
 resource "aws_cloudwatch_metric_alarm" "EC2_CPU_Usage_Alarm" {
   alarm_name          = "EC2_CPU_Usage_Alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -86,7 +92,23 @@ resource "aws_cloudwatch_metric_alarm" "EC2_MEM_Usage_Alarm" {
   ok_actions          = [aws_sns_topic.monitoring.arn]
   alarm_actions       = [aws_sns_topic.monitoring.arn]
 
-  # dimensions = {
-  #   InstanceId = "ami-041306c411c38a789"
-  # }
+  dimensions = {
+    ImageId = "ami-041306c411c38a789"
+  }
 }
+
+#FSx Alarm
+
+# resource "aws_cloudwatch_metric_alarm" "FSx_Storage_Capacity_Alarm" {
+#   alarm_name          = "FSx_Storage_Capacity_Alarm"
+#   comparison_operator = "GreaterThanOrEqualToThreshold"
+#   evaluation_periods  = "2"
+#   metric_name         = "FreeStorageCapacity"
+#   namespace           = "AWS/FSx"
+#   period              = "60"
+#   statistic           = "Average"
+#   threshold           = "70"
+#   alarm_description   = "This metric monitors FSx storage utilization exceeding 70%"
+#   ok_actions          = [aws_sns_topic.monitoring.arn]
+#   alarm_actions       = [aws_sns_topic.monitoring.arn]
+# }

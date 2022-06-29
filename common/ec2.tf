@@ -8,11 +8,11 @@ resource "aws_instance" "cnb_windows_ad" {
   subnet_id              = aws_subnet.cnb_private_subnets[0].id
   vpc_security_group_ids = [aws_security_group.windows_instance.id]
   iam_instance_profile   = aws_iam_instance_profile.cnb_ec2_ssm.name
-  user_data              = file("../../common/user_data_dc.ps1")
+  user_data              = file("../../common/data/user_data_dc.ps1")
   private_ip             = "10.200.2.10"
   tags = {
     platform = "windows"
-    Name     = "Windows-2022"
+    Name     = "Windows-2019"
   }
 }
 
@@ -75,7 +75,7 @@ resource "aws_launch_configuration" "cnb_webserver" {
   image_id             = data.aws_ami.amazon-linux-2.id
   instance_type        = var.launch_configuration.instance_type
   security_groups      = [aws_security_group.cnb_webserver_sg.id]
-  user_data            = file("../../common/user-data-apache.sh")
+  user_data            = file("../../common/data/user-data-apache.sh")
   iam_instance_profile = aws_iam_instance_profile.cnb_ec2_ssm.arn
   #key_name = aws_key_pair.ssh.id
   lifecycle {
