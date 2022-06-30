@@ -10,15 +10,15 @@ resource "aws_instance" "cnb_windows_ad" {
   subnet_id              = aws_subnet.cnb_private_subnets[0].id
   vpc_security_group_ids = [aws_security_group.windows_instance.id]
   iam_instance_profile   = aws_iam_instance_profile.cnb_ec2_ssm.name
-  user_data              = file("../../common/data/user_data_dc.ps1")
+  user_data              = file("../../common/templates/user-data/user_data_dc.ps1")
   private_ip             = "10.200.2.10"
   tags = {
     platform = "windows"
     Name     = "Windows-2019"
   }
   root_block_device {
-    # encrypted   = true
-    # kms_key_id  = module.kms_ebs.key_arn
+    encrypted   = true
+    kms_key_id  = module.kms_ebs.key_arn
     volume_size = "70"
     volume_type = "gp3"
     #iops        = 500
@@ -32,6 +32,9 @@ resource "aws_ebs_volume" "cnb_windows_ad_extra_disk" {
   type              = "io2"
   size              = 127
   iops              = 500
+
+  encrypted  = true
+  kms_key_id = module.kms_ebs.key_arn
 }
 
 resource "aws_volume_attachment" "cnb_windows_ad_extra_disk" {

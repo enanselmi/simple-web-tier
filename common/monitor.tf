@@ -9,8 +9,6 @@ resource "aws_sns_topic_policy" "monitoring" {
   policy = data.aws_iam_policy_document.monitoring_sns_topic_policy.json
 }
 
-data "aws_caller_identity" "current" {}
-
 data "aws_iam_policy_document" "monitoring_sns_topic_policy" {
   policy_id = "__default_policy_ID"
 
@@ -62,7 +60,7 @@ data "aws_iam_policy_document" "monitoring_sns_topic_policy" {
 resource "aws_ssm_parameter" "windows_agent_config" {
   name  = "WindowsAgentConfig"
   type  = "String"
-  value = file("../../common/data/WindowsAgentConfig.json")
+  value = file("../../common/templates/config/WindowsAgentConfig.json")
 }
 
 resource "aws_cloudwatch_metric_alarm" "EC2_CPU_Usage_Alarm" {

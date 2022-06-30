@@ -8,7 +8,13 @@
 #   vpc_security_group_ids = [aws_security_group.cnb_webserver_sg.id]
 #   iam_instance_profile   = aws_iam_instance_profile.cnb_ec2_ssm.name
 #   user_data              = file("../../common/user-data-apache.sh")
+# root_block_device {
+#     encrypted   = true
+#     kms_key_id  = module.kms_ebs.key_arn
+#     volume_size = "70"
+#     volume_type = "gp3"
 
+#   }
 #   tags = {
 #     platform = "AMZLINUX2"
 #     Name     = "L-pub"
@@ -19,8 +25,14 @@ resource "aws_launch_configuration" "cnb_webserver" {
   image_id             = data.aws_ami.amazon-linux-2.id
   instance_type        = var.launch_configuration.instance_type
   security_groups      = [aws_security_group.cnb_webserver_sg.id]
-  user_data            = file("../../common/data/user-data-apache.sh")
+  user_data            = file("../../common/templates/user-data/user-data-apache.sh")
   iam_instance_profile = aws_iam_instance_profile.cnb_ec2_ssm.arn
+  root_block_device {
+    encrypted = true
+    #kms_key_id  = module.kms_ebs.key_arn
+    volume_size = "70"
+    volume_type = "gp3"
+  }
   #key_name = aws_key_pair.ssh.id
   lifecycle {
     create_before_destroy = true
