@@ -17,8 +17,8 @@ resource "aws_instance" "cnb_windows_ad" {
     Name     = "Windows-2019"
   }
   root_block_device {
-    encrypted   = true
-    kms_key_id  = module.kms_ebs.key_arn
+    encrypted = true
+    #kms_key_id  = module.kms_ebs.key_arn
     volume_size = "70"
     volume_type = "gp3"
     #iops        = 500

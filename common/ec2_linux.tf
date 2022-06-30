@@ -21,6 +21,14 @@
 #   }
 # }
 
+
+resource "aws_ebs_encryption_by_default" "ebs_default_enc" {
+  enabled = true
+}
+resource "aws_ebs_default_kms_key" "ebs_default_kms_key" {
+  key_arn = module.kms_ebs.key_arn
+}
+
 resource "aws_launch_configuration" "cnb_webserver" {
   image_id             = data.aws_ami.amazon-linux-2.id
   instance_type        = var.launch_configuration.instance_type
