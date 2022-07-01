@@ -147,3 +147,71 @@ resource "aws_vpc_endpoint_route_table_association" "dynamodb_public_rt" {
 }
 
 
+resource "aws_security_group" "ssm_vpc_endpoint_sg" {
+  name        = "ssm_vpc_endpoint_sg"
+  description = "ssm_vpc_endpoint_sg"
+  vpc_id      = aws_vpc.cnb_vpc.id
+
+  ingress {
+    description     = "HTTPS from VPC"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.cnb_webserver_sg.id]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "ssm_vpc_endpoint_sg"
+  }
+}
+
+resource "aws_vpc_endpoint" "ssm" {
+  vpc_id            = aws_vpc.cnb_vpc.id
+  service_name      = "com.amazonaws.us-east-1.ssm"
+  vpc_endpoint_type = "Interface"
+
+  security_group_ids = [aws_security_group.ssm_vpc_endpoint_sg.id]
+  subnet_ids         = aws_subnet.cnb_private_subnets[*].id
+
+  private_dns_enabled = true
+
+  tags = {
+    Name = "ssm_endpoint"
+  }
+}
+
+resource "aws_vpc_endpoint" "ec2messages" {
+  vpc_id            = aws_vpc.cnb_vpc.id
+  service_name      = "com.amazonaws.us-east-1.ec2messages"
+  vpc_endpoint_type = "Interface"
+
+  security_group_ids = [aws_security_group.ssm_vpc_endpoint_sg.id]
+  subnet_ids         = aws_subnet.cnb_private_subnets[*].id
+
+  private_dns_enabled = true
+
+  tags = {
+    Name = "ec2messages_endpoint"
+  }
+}
+
+resource "aws_vpc_endpoint" "ssmmessages" {
+  vpc_id            = aws_vpc.cnb_vpc.id
+  service_name      = "com.amazonaws.us-east-1.ssmmessages"
+  vpc_endpoint_type = "Interface"
+
+  security_group_ids = [aws_security_group.ssm_vpc_endpoint_sg.id]
+  subnet_ids         = aws_subnet.cnb_private_subnets[*].id
+
+  private_dns_enabled = true
+
+  tags = {
+    Name = "ssmmessages_endpoint"
+  }
+}
+
