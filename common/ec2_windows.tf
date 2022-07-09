@@ -24,6 +24,7 @@ resource "aws_instance" "cnb_windows_ad" {
     #iops        = 500
     #tags        = merge(tomap({ "Name" = "${local.naming_prefix}-ebsroot-FSVM1-${var.tags.region}" }), var.tags)
     #delete_on_termination = false
+    tags = merge(var.default_tags, { Name = "Windows EBS Test For CNB prod" })
   }
 }
 
@@ -69,6 +70,32 @@ resource "aws_security_group" "windows_instance" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
+#Ejemplo de SG con dynamic block
+
+resource "aws_security_group" "windows_instance_dynamic" {
+  name   = "windows-security-group-dynamic"
+  vpc_id = aws_vpc.cnb_vpc.id
+
+  dynamic "ingress" {
+    for_each = var.windows_ingress_ports
+    content {
+      from_port       = ingress.value
+      to_port         = ingress.value
+      protocol        = "tcp"
+      cidr_blocks     = ["0.0.0.0/0"]
+      security_groups = [aws_security_group.windows_instance.id]
+    }
   }
 
   egress {

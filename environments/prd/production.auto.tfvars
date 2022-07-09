@@ -160,3 +160,39 @@ iam = {
   iam_role_policy_name  = "cnb_ec2_ssm"
 }
 
+windows_ingress_ports = [3389, 80, 443, 1234, 345, 25, 5001, 5002, 5003]
+
+asg_tags_dynamic = [
+  {
+    name  = "environment"
+    value = "prod"
+  },
+  {
+    name  = "role"
+    value = "production"
+  },
+  {
+    name  = "Name"
+    value = "Test For CNB prod dynamic"
+  },
+  {
+    name  = "owner"
+    value = "eanselmi@edrans.com"
+  },
+  {
+    name  = "costCenter"
+    value = "SYSENG"
+  },
+  {
+    name  = "tagVersion"
+    value = 1
+  },
+  {
+    name  = "project"
+    value = "CNB"
+  },
+  {
+    name  = "expirationDate"
+    value = "12/12/2022"
+  }
+]

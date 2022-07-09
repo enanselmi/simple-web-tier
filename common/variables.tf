@@ -105,3 +105,15 @@ variable "iam" {
   description = "List of IAM variables"
   type        = any
 }
+
+variable "windows_ingress_ports" {
+  description = "List of ingress ports for Windows"
+  type        = list(any)
+}
+
+variable "asg_tags_dynamic" {
+  description = "List of tags for ASG"
+  type        = list(map(string))
+}
+
+

@@ -67,7 +67,28 @@ resource "aws_autoscaling_group" "cnb_webserver" {
     # }
   }
 
-  tags = var.asg_tags.default
+  #Deprecated
+  #tags = var.asg_tags.default
+
+  # tag {
+  #   key                 = "Name"
+  #   value               = "EC2-CNB-TEST"
+  #   propagate_at_launch = true
+  # }
+  # tag {
+  #   key                 = "Proj"
+  #   value               = "CNB"
+  #   propagate_at_launch = true
+  # }
+
+  dynamic "tag" {
+    for_each = var.asg_tags_dynamic
+    content {
+      key                 = tag.value.name
+      value               = tag.value.value
+      propagate_at_launch = true
+    }
+  }
 
 }
 
