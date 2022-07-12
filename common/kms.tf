@@ -11,6 +11,6 @@ module "kms_ebs" {
   })
 
   tags = {
-    "Name" = "CNB-EBS"
+    "Name" = "${local.naming_prefix}-CNB-EBS-KMS"
   }
 }

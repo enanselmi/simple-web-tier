@@ -1,3 +1,4 @@
-# locals {
-#   r53_internal_zone = "${module.default_label.environment}.${module.default_label.project}.internal"
-# }
+locals {
+  naming_prefix = "tf-${var.default_tags.project}-${var.default_tags.environment}"
+}
+

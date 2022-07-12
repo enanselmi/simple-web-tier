@@ -42,28 +42,32 @@ resource "aws_lb_listener" "cnb_public_alb_listener_http" {
   protocol          = var.cnb_public_alb_listener_http.protocol
 
   default_action {
-    type = var.cnb_public_alb_listener_http.type
-
-    redirect {
-      port        = var.cnb_public_alb_listener_http.port_redirect
-      protocol    = var.cnb_public_alb_listener_http.redirect_protocol
-      status_code = var.cnb_public_alb_listener_http.status_code
-    }
-  }
-}
-
-resource "aws_lb_listener" "cnb_public_alb_listener_https" {
-  load_balancer_arn = aws_lb.cnb_public_alb.arn
-  port              = var.cnb_public_alb_listener_https.port
-  protocol          = var.cnb_public_alb_listener_https.protocol
-  ssl_policy        = var.cnb_public_alb_listener_https.ssl_policy
-  certificate_arn   = var.cnb_public_alb_listener_https.certificate_arn
-
-  default_action {
     type             = var.cnb_public_alb_listener_https.type
     target_group_arn = aws_lb_target_group.cnb_webserver_target.arn
   }
+  # default_action {
+  #   type = var.cnb_public_alb_listener_http.type
+
+  #   redirect {
+  #     port        = var.cnb_public_alb_listener_http.port_redirect
+  #     protocol    = var.cnb_public_alb_listener_http.redirect_protocol
+  #     status_code = var.cnb_public_alb_listener_http.status_code
+  #   }
+  # }
 }
+
+# resource "aws_lb_listener" "cnb_public_alb_listener_https" {
+#   load_balancer_arn = aws_lb.cnb_public_alb.arn
+#   port              = var.cnb_public_alb_listener_https.port
+#   protocol          = var.cnb_public_alb_listener_https.protocol
+#   ssl_policy        = var.cnb_public_alb_listener_https.ssl_policy
+#   certificate_arn   = var.cnb_public_alb_listener_https.certificate_arn
+
+#   default_action {
+#     type             = var.cnb_public_alb_listener_https.type
+#     target_group_arn = aws_lb_target_group.cnb_webserver_target.arn
+#   }
+# }
 
 
 # resource "aws_lb_listener_rule" "static" {
@@ -119,6 +123,6 @@ resource "aws_security_group" "cnb_public_alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "cnb_public_alb_sg"
+    Name = "${local.naming_prefix}-SG-ALB"
   }
 }

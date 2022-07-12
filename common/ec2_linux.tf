@@ -125,7 +125,7 @@ resource "aws_security_group" "cnb_webserver_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "cnb_webserver_sg"
+    Name = "${local.naming_prefix}-SG-WEBSERVER"
   }
 }
 

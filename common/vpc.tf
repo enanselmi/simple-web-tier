@@ -5,19 +5,19 @@ resource "aws_vpc" "cnb_vpc" {
   enable_classiclink   = var.vpc.enable_classiclink
   instance_tenancy     = var.vpc.instance_tenancy
   tags = {
-    Name = "CNB VPC test"
+    Name = "${local.naming_prefix}-CNB-VPC-TEST"
   }
 }
 
-# WINDOWS AD DNS - USE ONLY FOR AD TESTING
+#WINDOWS AD DNS - USE ONLY FOR AD TESTING
 
-# resource "aws_vpc_dhcp_options" "dhcp_custom_set" {
-#   domain_name_servers = ["10.200.2.10"]
-# }
-# resource "aws_vpc_dhcp_options_association" "dhcp_custom_set" {
-#   vpc_id          = aws_vpc.cnb_vpc.id
-#   dhcp_options_id = aws_vpc_dhcp_options.dhcp_custom_set.id
-# }
+resource "aws_vpc_dhcp_options" "dhcp_custom_set" {
+  domain_name_servers = ["10.200.2.10"]
+}
+resource "aws_vpc_dhcp_options_association" "dhcp_custom_set" {
+  vpc_id          = aws_vpc.cnb_vpc.id
+  dhcp_options_id = aws_vpc_dhcp_options.dhcp_custom_set.id
+}
 
 # ALTERNATIVE DNS CONFIGURATION
 
@@ -37,7 +37,7 @@ resource "aws_subnet" "cnb_public_subnets" {
   map_public_ip_on_launch = "true"
   availability_zone       = var.azs.default[count.index]
   tags = {
-    Name = "Public-Subnet-${count.index}-${var.azs.default[count.index]}"
+    Name = "${local.naming_prefix}-Public-Subnet-${count.index}-${var.azs.default[count.index]}"
   }
 }
 
@@ -48,14 +48,14 @@ resource "aws_subnet" "cnb_private_subnets" {
   map_public_ip_on_launch = "false"
   availability_zone       = var.azs.default[count.index]
   tags = {
-    Name = "Private-Subnet-${count.index}-${var.azs.default[count.index]}"
+    Name = "${local.naming_prefix}-Private-Subnet-${count.index}-${var.azs.default[count.index]}"
   }
 }
 
 resource "aws_internet_gateway" "cnb_igw" {
   vpc_id = aws_vpc.cnb_vpc.id
   tags = {
-    Name = "CNB IGW"
+    Name = "${local.naming_prefix}-CNB-IGW"
   }
 }
 
@@ -64,7 +64,7 @@ resource "aws_eip" "eips" {
   vpc        = true
   depends_on = [aws_internet_gateway.cnb_igw]
   tags = {
-    Name = "CNB-eip-${count.index}"
+    Name = "${local.naming_prefix}-CNB-EIP-${count.index}"
   }
 }
 
@@ -74,7 +74,7 @@ resource "aws_nat_gateway" "nat_gateways" {
   subnet_id     = aws_subnet.cnb_public_subnets[count.index].id
   depends_on    = [aws_internet_gateway.cnb_igw, aws_eip.eips]
   tags = {
-    Name = "CNB-NGW-${count.index}"
+    Name = "${local.naming_prefix}-CNB-NGW-${count.index}"
   }
 }
 
@@ -86,7 +86,7 @@ resource "aws_route_table" "cnb_public_crt" {
     gateway_id = aws_internet_gateway.cnb_igw.id
   }
   tags = {
-    Name = "CNB-Public-CRT"
+    Name = "${local.naming_prefix}-CNB-Public-CRT"
   }
 }
 
@@ -104,7 +104,7 @@ resource "aws_route_table" "cnb_private_crts" {
     nat_gateway_id = aws_nat_gateway.nat_gateways[count.index].id
   }
   tags = {
-    Name = "CNB-Private-CRT-${var.azs.default[count.index]}"
+    Name = "${local.naming_prefix}-CNB-PRIVATE-CRT-${var.azs.default[count.index]}"
   }
 }
 
@@ -120,7 +120,7 @@ resource "aws_vpc_endpoint" "s3" {
   vpc_endpoint_type = "Gateway"
 
   tags = {
-    Name = "S3-endpoint"
+    Name = "${local.naming_prefix}-S3-ENDPOINT"
   }
 }
 
@@ -136,7 +136,7 @@ resource "aws_vpc_endpoint" "dynamodb" {
   vpc_endpoint_type = "Gateway"
 
   tags = {
-    Name = "DynamoDB-endpoint"
+    Name = "${local.naming_prefix}-DynamoDB-ENDPOINT"
   }
 }
 
@@ -166,52 +166,55 @@ resource "aws_security_group" "ssm_vpc_endpoint_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "ssm_vpc_endpoint_sg"
+    Name = "${local.naming_prefix}-SSM_VPC_ENDPOINT_SG"
   }
 }
 
-resource "aws_vpc_endpoint" "ssm" {
-  vpc_id            = aws_vpc.cnb_vpc.id
-  service_name      = "com.amazonaws.us-east-1.ssm"
-  vpc_endpoint_type = "Interface"
 
-  security_group_ids = [aws_security_group.ssm_vpc_endpoint_sg.id]
-  subnet_ids         = aws_subnet.cnb_private_subnets[*].id
+#VPCE for SSM
 
-  private_dns_enabled = true
+# resource "aws_vpc_endpoint" "ssm" {
+#   vpc_id            = aws_vpc.cnb_vpc.id
+#   service_name      = "com.amazonaws.us-east-1.ssm"
+#   vpc_endpoint_type = "Interface"
 
-  tags = {
-    Name = "ssm_endpoint"
-  }
-}
+#   security_group_ids = [aws_security_group.ssm_vpc_endpoint_sg.id]
+#   subnet_ids         = aws_subnet.cnb_private_subnets[*].id
 
-resource "aws_vpc_endpoint" "ec2messages" {
-  vpc_id            = aws_vpc.cnb_vpc.id
-  service_name      = "com.amazonaws.us-east-1.ec2messages"
-  vpc_endpoint_type = "Interface"
+#   private_dns_enabled = true
 
-  security_group_ids = [aws_security_group.ssm_vpc_endpoint_sg.id]
-  subnet_ids         = aws_subnet.cnb_private_subnets[*].id
+#   tags = {
+#     Name = "${local.naming_prefix}-SSM_ENDPOINT"
+#   }
+# }
 
-  private_dns_enabled = true
+# resource "aws_vpc_endpoint" "ec2messages" {
+#   vpc_id            = aws_vpc.cnb_vpc.id
+#   service_name      = "com.amazonaws.us-east-1.ec2messages"
+#   vpc_endpoint_type = "Interface"
 
-  tags = {
-    Name = "ec2messages_endpoint"
-  }
-}
+#   security_group_ids = [aws_security_group.ssm_vpc_endpoint_sg.id]
+#   subnet_ids         = aws_subnet.cnb_private_subnets[*].id
 
-resource "aws_vpc_endpoint" "ssmmessages" {
-  vpc_id            = aws_vpc.cnb_vpc.id
-  service_name      = "com.amazonaws.us-east-1.ssmmessages"
-  vpc_endpoint_type = "Interface"
+#   private_dns_enabled = true
 
-  security_group_ids = [aws_security_group.ssm_vpc_endpoint_sg.id]
-  subnet_ids         = aws_subnet.cnb_private_subnets[*].id
+#   tags = {
+#     Name = "${local.naming_prefix}-EC2MESSAGES_ENDPOINT"
+#   }
+# }
 
-  private_dns_enabled = true
+# resource "aws_vpc_endpoint" "ssmmessages" {
+#   vpc_id            = aws_vpc.cnb_vpc.id
+#   service_name      = "com.amazonaws.us-east-1.ssmmessages"
+#   vpc_endpoint_type = "Interface"
 
-  tags = {
-    Name = "ssmmessages_endpoint"
-  }
-}
+#   security_group_ids = [aws_security_group.ssm_vpc_endpoint_sg.id]
+#   subnet_ids         = aws_subnet.cnb_private_subnets[*].id
+
+#   private_dns_enabled = true
+
+#   tags = {
+#     Name = "${local.naming_prefix}-SSMMESSAGES_ENDPOINT"
+#   }
+# }
 

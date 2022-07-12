@@ -1,12 +1,12 @@
 resource "aws_instance" "cnb_windows_ad" {
+
   #ami = "ami-0e4eb3558ed6398c8" #Ami used in CNB prd account (USA) Windows 2022
-
-  # ami                    = "ami-0efd91e0e06eafc06" #Custom AMI With AWS CLI included
   #ami = "ami-041306c411c38a789" #Windows 2019 original
-  ami = "ami-00e43ba787345b2df" #Windows 2019 custom
+  ami = "ami-00da7e8b85c75fcb3" #2022 custom with aws cli
 
-  instance_type          = "c5.large"
-  key_name               = "windows-test"
+
+  instance_type = "c5.large"
+  #key_name               = "windows-test"
   subnet_id              = aws_subnet.cnb_private_subnets[0].id
   vpc_security_group_ids = [aws_security_group.windows_instance.id]
   iam_instance_profile   = aws_iam_instance_profile.cnb_ec2_ssm.name
@@ -14,7 +14,7 @@ resource "aws_instance" "cnb_windows_ad" {
   private_ip             = "10.200.2.10"
   tags = {
     platform = "windows"
-    Name     = "Windows-2019"
+    Name     = "${local.naming_prefix}-Windows-2022"
   }
   root_block_device {
     encrypted = true
@@ -24,7 +24,7 @@ resource "aws_instance" "cnb_windows_ad" {
     #iops        = 500
     #tags        = merge(tomap({ "Name" = "${local.naming_prefix}-ebsroot-FSVM1-${var.tags.region}" }), var.tags)
     #delete_on_termination = false
-    tags = merge(var.default_tags, { Name = "Windows EBS Test For CNB prod" })
+    tags = merge(var.default_tags, { Name = "${local.naming_prefix}-Windows-AD-EBS" })
   }
 }
 
@@ -47,17 +47,18 @@ resource "aws_volume_attachment" "cnb_windows_ad_extra_disk" {
 
 # resource "aws_instance" "cnb_windows_domain_member" {
 #   #ami = "ami-0e4eb3558ed6398c8" #Ami used in CNB prd account (USA)
+#   ami = "ami-00da7e8b85c75fcb3" #2022 custom with aws cli
+#   #depends_on = [aws_instance.cnb_windows_ad]
 
-#   ami                    = "ami-0efd91e0e06eafc06" #Custom AMI With AWS CLI included
-#   instance_type          = "c5.xlarge"
-#   key_name               = "windows-test"
+#   instance_type = "c5.large"
+#   #key_name               = "windows-test"
 #   subnet_id              = aws_subnet.cnb_private_subnets[0].id
 #   vpc_security_group_ids = [aws_security_group.windows_instance.id]
 #   iam_instance_profile   = aws_iam_instance_profile.cnb_ec2_ssm.name
-#   user_data              = file("../../common/user_data_domain_join.ps1")
+#   user_data              = file("../../common/templates/user-data/user_data_domain_join.ps1")
 #   tags = {
 #     platform = "windows"
-#     Name     = "Windows-2022-biss"
+#     Name     = "${local.naming_prefix}-Windows-2022-Member"
 #   }
 # }
 
@@ -77,6 +78,9 @@ resource "aws_security_group" "windows_instance" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "${local.naming_prefix}-SG-Windows"
   }
 }
 
@@ -104,6 +108,10 @@ resource "aws_security_group" "windows_instance_dynamic" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = {
+    Name = "${local.naming_prefix}-SG-Windows-Dynamic"
+  }
+
 }
 
 

@@ -48,9 +48,10 @@ alb_target_group = {
 }
 
 cnb_public_alb_listener_http = {
-  port              = "80"
-  protocol          = "HTTP"
-  type              = "redirect"
+  port     = "80"
+  protocol = "HTTP"
+  #type              = "redirect"
+  type              = "forward"
   port_redirect     = "443"
   redirect_protocol = "HTTPS"
   status_code       = "HTTP_301"
@@ -173,7 +174,7 @@ asg_tags_dynamic = [
   },
   {
     name  = "Name"
-    value = "Test For CNB prod dynamic"
+    value = "CNB-PRD-ASG-WEB-SERVER"
   },
   {
     name  = "owner"

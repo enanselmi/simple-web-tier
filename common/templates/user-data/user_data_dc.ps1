@@ -4,6 +4,7 @@ $password = $password.password_windows | ConvertTo-SecureString -AsPlainText -Fo
 new-localuser -name "localadmin" -password $password
 add-localgroupmember -group "Remote Desktop Users" -member "localadmin"
 add-localgroupmember -group "Administrators" -member "localadmin"
+Set-LocalUser -Name administrator -Password $password -Verbose
 
 function prereq {    
     $command = "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12"
@@ -16,4 +17,8 @@ prereq
 
 & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:WindowsAgentConfig
 
+#Install domain features and configure new forest
+Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
+Install-ADDSForest -DomainName "contoso.com" -DomainNetBiosName "CONTOSO" -InstallDns:$true -SafeModeAdministratorPassword $password -Force
+restart-computer
 </powershell>
