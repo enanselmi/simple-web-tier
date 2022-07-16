@@ -1,20 +1,33 @@
+#WINDOWS AD DNS - USE ONLY FOR AD TESTING
+
+# resource "aws_vpc_dhcp_options" "dhcp_custom_set" {
+#   domain_name_servers = ["10.200.2.11"]
+# }
+# resource "aws_vpc_dhcp_options_association" "dhcp_custom_set" {
+#   vpc_id          = aws_vpc.cnb_vpc.id
+#   dhcp_options_id = aws_vpc_dhcp_options.dhcp_custom_set.id
+# }
+
+
 resource "aws_instance" "cnb_windows_ad" {
 
   #ami = "ami-0e4eb3558ed6398c8" #Ami used in CNB prd account (USA) Windows 2022
+  #ami = "ami-0e1a729017e59e409" #Windows 2022 original
   #ami = "ami-041306c411c38a789" #Windows 2019 original
-  ami = "ami-00da7e8b85c75fcb3" #2022 custom with aws cli
+  ami = "ami-06a0bd14ccbce0c87" #2022 custom with aws cli
 
 
-  instance_type = "c5.large"
-  #key_name               = "windows-test"
+  instance_type          = "c5.large"
+  key_name               = "windows-test"
   subnet_id              = aws_subnet.cnb_private_subnets[0].id
   vpc_security_group_ids = [aws_security_group.windows_instance.id]
   iam_instance_profile   = aws_iam_instance_profile.cnb_ec2_ssm.name
   user_data              = file("../../common/templates/user-data/user_data_dc.ps1")
-  private_ip             = "10.200.2.10"
+  private_ip             = "10.200.2.11"
   tags = {
     platform = "windows"
     Name     = "${local.naming_prefix}-Windows-2022"
+    Backup   = "True"
   }
   root_block_device {
     encrypted = true
@@ -24,7 +37,7 @@ resource "aws_instance" "cnb_windows_ad" {
     #iops        = 500
     #tags        = merge(tomap({ "Name" = "${local.naming_prefix}-ebsroot-FSVM1-${var.tags.region}" }), var.tags)
     #delete_on_termination = false
-    tags = merge(var.default_tags, { Name = "${local.naming_prefix}-Windows-AD-EBS" })
+    tags = merge(var.default_tags, { Name = "${local.naming_prefix}-Windows-AD-EBS" }, { Backup = "True" })
   }
 }
 
@@ -36,6 +49,9 @@ resource "aws_ebs_volume" "cnb_windows_ad_extra_disk" {
 
   encrypted  = true
   kms_key_id = module.kms_ebs.key_arn
+  tags = {
+    Backup = "True"
+  }
 }
 
 resource "aws_volume_attachment" "cnb_windows_ad_extra_disk" {
@@ -46,12 +62,9 @@ resource "aws_volume_attachment" "cnb_windows_ad_extra_disk" {
 
 
 # resource "aws_instance" "cnb_windows_domain_member" {
-#   #ami = "ami-0e4eb3558ed6398c8" #Ami used in CNB prd account (USA)
-#   ami = "ami-00da7e8b85c75fcb3" #2022 custom with aws cli
-#   #depends_on = [aws_instance.cnb_windows_ad]
-
-#   instance_type = "c5.large"
-#   #key_name               = "windows-test"
+#   ami                    = "ami-06a0bd14ccbce0c87" #2022 custom with aws cli
+#   instance_type          = "c5.large"
+#   key_name               = "windows-test"
 #   subnet_id              = aws_subnet.cnb_private_subnets[0].id
 #   vpc_security_group_ids = [aws_security_group.windows_instance.id]
 #   iam_instance_profile   = aws_iam_instance_profile.cnb_ec2_ssm.name

@@ -10,9 +10,8 @@ azs = {
   default = ["us-east-1a", "us-east-1b"]
 }
 
-region = {
-  default = "us-east-1"
-}
+region = "us-east-1"
+
 
 default_tags = {
   environment    = "prod"
@@ -21,8 +20,9 @@ default_tags = {
   owner          = "eanselmi@edrans.com"
   costCenter     = "SYSENG"
   tagVersion     = 1
-  project        = "CNB"
+  project        = "cnb"
   expirationDate = "12/12/2022"
+  region         = "us-east-1"
 }
 
 alb = {
@@ -74,51 +74,6 @@ cnb_cert = {
 cnb_public_alb_sg = {
   name        = "cnb_public_alb_sg"
   description = "Allow HTTPS inbound traffic"
-}
-
-asg_tags = {
-  default = [
-    {
-      key                 = "environment"
-      value               = "prod"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "role"
-      value               = "production"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "Name"
-      value               = "Test For CNB prod"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "owner"
-      value               = "eanselmi@edrans.com"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "costCenter"
-      value               = "SYSENG"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "tagVersion"
-      value               = 1
-      propagate_at_launch = true
-    },
-    {
-      key                 = "project"
-      value               = "CNB"
-      propagate_at_launch = true
-    },
-    {
-      key                 = "expirationDate"
-      value               = "12/12/2022"
-      propagate_at_launch = true
-    },
-  ]
 }
 
 vpc = {
@@ -195,5 +150,35 @@ asg_tags_dynamic = [
   {
     name  = "expirationDate"
     value = "12/12/2022"
+  }
+]
+
+#Backup Values
+key               = "Backup"
+value             = "True"
+backup_vault_name = "backup_vault"
+rules = [{
+  name                     = "daily_snapshot"
+  schedule                 = "cron(02 1 ? * MON-SAT *)"
+  start_window             = 60
+  completion_window        = 180
+  delete_after             = 7
+  enable_continuous_backup = true
+  },
+  {
+    name                     = "weekly_snapshot"
+    schedule                 = "cron(40 16 ? * 1 *)"
+    start_window             = 60
+    completion_window        = 180
+    delete_after             = 30
+    enable_continuous_backup = false
+  },
+  {
+    name                     = "monthly_snapshot"
+    schedule                 = "cron(0 5 1 * ? *)"
+    start_window             = 60
+    completion_window        = 180
+    delete_after             = 365
+    enable_continuous_backup = false
   }
 ]

@@ -9,16 +9,20 @@
 #   security_group_ids = [aws_security_group.sr1_fsx_sg.id]
 
 #   self_managed_active_directory {
-#     dns_ips     = ["10.200.2.10"]
-#     domain_name = "contoso.local"
+#     dns_ips     = ["10.200.2.11"]
+#     domain_name = "contoso.com"
 #     username    = "administrator"
-#     password    = "Pa##w0rd"
+#     password    = "Pa##w0rd2"
 #   }
+#   tags = merge(var.default_tags, { Name = "${local.naming_prefix}-FSx" }, { Backup = "True" })
 # }
 
 # resource "aws_security_group" "sr1_fsx_sg" {
-#   name   = "test-fsx"
+#   name   = "FSx_SG"
 #   vpc_id = aws_vpc.cnb_vpc.id
+#   tags = {
+#     Name = "${local.naming_prefix}-SG-FSx"
+#   }
 # }
 
 # resource "aws_security_group_rule" "sr1_fsx_sg_egress" {

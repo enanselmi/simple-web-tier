@@ -8,3 +8,5 @@ terraform.tfstate.backup
 **/environments/prd/terraform.tfstate.backup
 **/terraform.tfstate.backup
 **/.terraform.tfstate.backup
+environments/prd/terraform.tfstate.1657647466.backup
+images/.$diagram.png.bkp

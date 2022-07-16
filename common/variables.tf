@@ -26,9 +26,8 @@ variable "azs" {
 }
 
 variable "region" {
-  type        = any
+  type        = string
   description = "Region where to deploy"
-  default     = []
 }
 
 variable "default_tags" {
@@ -76,11 +75,6 @@ variable "cnb_public_alb_sg" {
   type        = any
 }
 
-variable "asg_tags" {
-  description = "List of tags variables fot ASG"
-  type        = any
-}
-
 variable "launch_configuration" {
   description = "List of launch configuration variables"
   type        = any
@@ -116,4 +110,20 @@ variable "asg_tags_dynamic" {
   type        = list(map(string))
 }
 
+variable "key" {
+  description = "Key tag for Backups"
+  type        = string
+}
 
+variable "value" {
+  description = "Value for backup tag"
+  type        = string
+}
+variable "rules" {
+  description = "Backup rules"
+  type        = any
+}
+variable "backup_vault_name" {
+  description = "Vault name for Backups"
+  type        = string
+}

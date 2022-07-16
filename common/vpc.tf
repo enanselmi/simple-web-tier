@@ -9,16 +9,6 @@ resource "aws_vpc" "cnb_vpc" {
   }
 }
 
-#WINDOWS AD DNS - USE ONLY FOR AD TESTING
-
-resource "aws_vpc_dhcp_options" "dhcp_custom_set" {
-  domain_name_servers = ["10.200.2.10"]
-}
-resource "aws_vpc_dhcp_options_association" "dhcp_custom_set" {
-  vpc_id          = aws_vpc.cnb_vpc.id
-  dhcp_options_id = aws_vpc_dhcp_options.dhcp_custom_set.id
-}
-
 # ALTERNATIVE DNS CONFIGURATION
 
 # resource "aws_vpc_dhcp_options" "dns_resolver" {
